@@ -130,6 +130,6 @@ export function App() {
       </div>
     </div>
   ) : (
-    <BubblesPage setOpen={setBubbles} />
+    <BubblesPage setOpen={setBubbles} open={bubbles} />
   );
 }

@@ -2,20 +2,20 @@ import { useEffect, useState } from "react";
 import { RiArrowLeftWideFill, RiTwitterXFill } from "react-icons/ri";
 import { TiUser } from "react-icons/ti";
 
-export default function BubblesPage({ setOpen }) {
+export default function BubblesPage({ setOpen, open }) {
   const [bubbles, setBubbles] = useState([]);
   const [newBubbleId, setNewBubbleId] = useState("");
 
   useEffect(() => {
+    if (!open) return;
+
     const generateWalletAddress = () => {
       const base58 =
         "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
       let address = "";
-
       for (let i = 0; i < 44; i++) {
         address += base58[Math.floor(Math.random() * base58.length)];
       }
-
       return address;
     };
 
@@ -45,43 +45,15 @@ export default function BubblesPage({ setOpen }) {
       vy: (Math.random() - 0.5) * 0.5,
     });
 
-    // Load existing bubbles from localStorage
-    const storedBubbles = JSON.parse(localStorage.getItem("bubbles") || "[]");
+    // ⏱️ 1. İlk açılışta sadece 2–4 fake bubble
+    const now = Date.now();
+    const initialCount = Math.floor(Math.random() * 3) + 2;
+    const initial = Array.from({ length: initialCount }, (_, i) =>
+      createRandomBubble(now - i * 1000)
+    );
+    setBubbles(initial);
 
-    // Generate initial fake bubbles if we don't have many
-    const initialBubbles = [...storedBubbles];
-    const currentTime = Date.now();
-
-    // Add 8-15 initial fake bubbles to make it feel active
-    const initialFakeCount = Math.floor(Math.random() * 8) + 8;
-    for (let i = 0; i < initialFakeCount; i++) {
-      const bubbleTime = currentTime - Math.random() * 300000; // Spread over last 5 minutes
-      initialBubbles.push(createRandomBubble(bubbleTime));
-    }
-
-    const processedBubbles = initialBubbles.map((bubble, index) => ({
-      ...bubble,
-      id: bubble.id || `bubble-${bubble.timestamp}-${index}`,
-      x: bubble.x || Math.random() * 80 + 10,
-      y: bubble.y || Math.random() * 80 + 10,
-      vx: bubble.vx || (Math.random() - 0.5) * 0.5,
-      vy: bubble.vy || (Math.random() - 0.5) * 0.5,
-    }));
-
-    setBubbles(processedBubbles);
-
-    // Mark the newest real bubble (from user) for animation
-    if (storedBubbles.length > 0) {
-      const newest = processedBubbles.find((b) =>
-        storedBubbles.some((sb) => sb.timestamp === b.timestamp)
-      );
-      if (newest) {
-        setNewBubbleId(newest.id);
-        setTimeout(() => setNewBubbleId(""), 2000);
-      }
-    }
-
-    // Set up interval to add new random bubbles periodically
+    // ⏱️ 2. Her 5 dakikada bir yeni bubble
     const addRandomBubble = () => {
       const newBubble = createRandomBubble(Date.now());
       setBubbles((prev) => [...prev, newBubble]);
@@ -89,23 +61,12 @@ export default function BubblesPage({ setOpen }) {
       setTimeout(() => setNewBubbleId(""), 2000);
     };
 
-    // Add new bubbles at random intervals (every 3-8 seconds)
-    const scheduleNextBubble = () => {
-      const delay = 5 * 60 * 1000; // 5 dakika = 300000 ms
-      setTimeout(() => {
-        addRandomBubble();
-        scheduleNextBubble(); // Schedule the next one
-      }, delay);
-    };
+    const interval = setInterval(() => {
+      addRandomBubble();
+    }, 5 * 60 * 1000); // 5 dakika
 
-    // Start the bubble generation cycle
-    scheduleNextBubble();
-
-    // Cleanup function to prevent memory leaks
-    return () => {
-      // The timeouts will be cleaned up when component unmounts
-    };
-  }, []);
+    return () => clearInterval(interval);
+  }, [open]);
 
   useEffect(() => {
     // Much gentler, slower floating animation like real bubbles
