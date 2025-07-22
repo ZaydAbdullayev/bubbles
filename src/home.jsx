@@ -38,10 +38,13 @@ export function App() {
   const [selectedColor, setSelectedColor] = useState("");
   const [walletAddress, setWalletAddress] = useState("");
   const [bubbles, setBubbles] = useState(false);
+  const [bubble, setBubble] = useState({
+    color: "#3B82F6",
+    wallet: "0x1234567890abcdef1234567890abcdef12345678",
+  });
 
   const handleJoinBubble = () => {
     if (!selectedColor) return;
-
     const bubbleData = {
       color: selectedColor,
       wallet:
@@ -49,12 +52,8 @@ export function App() {
         `0x${Math.random().toString(16).substr(2, 8)}...${Math.random()
           .toString(16)
           .substr(2, 4)}`,
-      timestamp: Date.now(),
     };
-
-    const existingBubbles = JSON.parse(localStorage.getItem("bubbles") || "[]");
-    existingBubbles.push(bubbleData);
-    localStorage.setItem("bubbles", JSON.stringify(existingBubbles));
+    setBubble(bubbleData);
     setBubbles(true);
   };
 
@@ -130,6 +129,6 @@ export function App() {
       </div>
     </div>
   ) : (
-    <BubblesPage setOpen={setBubbles} open={bubbles} />
+    <BubblesPage setOpen={setBubbles} open={bubbles} bubble={bubble} />
   );
 }

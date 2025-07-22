@@ -2,7 +2,15 @@ import { useEffect, useState } from "react";
 import { RiArrowLeftWideFill, RiTwitterXFill } from "react-icons/ri";
 import { TiUser } from "react-icons/ti";
 
-export default function BubblesPage({ setOpen, open }) {
+// const bubbleData = {
+//   color: selectedColor,
+//   wallet:
+//     walletAddress ||
+//     `0x${Math.random().toString(16).substr(2, 8)}...${Math.random()
+//       .toString(16)
+//       .substr(2, 4)}`,
+// };
+export default function BubblesPage({ setOpen, open, bubble }) {
   const [bubbles, setBubbles] = useState([]);
   const [newBubbleId, setNewBubbleId] = useState("");
 
@@ -34,9 +42,11 @@ export default function BubblesPage({ setOpen, open }) {
       "#6366F1",
     ];
 
-    const createRandomBubble = (timestamp) => ({
-      color: BUBBLE_COLORS[Math.floor(Math.random() * BUBBLE_COLORS.length)],
-      wallet: generateWalletAddress(),
+    const createRandomBubble = (timestamp, wallet = null, color = null) => ({
+      color: color
+        ? color
+        : BUBBLE_COLORS[Math.floor(Math.random() * BUBBLE_COLORS.length)],
+      wallet: wallet ? wallet : generateWalletAddress(),
       timestamp,
       id: `bubble-${timestamp}-${Math.random()}`,
       x: Math.random() * 80 + 10,
@@ -51,7 +61,10 @@ export default function BubblesPage({ setOpen, open }) {
     const initial = Array.from({ length: initialCount }, (_, i) =>
       createRandomBubble(now - i * 1000)
     );
-    setBubbles(initial);
+    setBubbles([
+      ...initial,
+      createRandomBubble(now, bubble.wallet, bubble.color),
+    ]);
 
     // ⏱️ 2. Her 5 dakikada bir yeni bubble
     const addRandomBubble = () => {
@@ -66,7 +79,7 @@ export default function BubblesPage({ setOpen, open }) {
     }, 5 * 60 * 1000); // 5 dakika
 
     return () => clearInterval(interval);
-  }, [open]);
+  }, [bubble.color, bubble.wallet, open]);
 
   useEffect(() => {
     // Much gentler, slower floating animation like real bubbles
