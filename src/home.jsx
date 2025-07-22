@@ -106,7 +106,7 @@ export function App() {
             <input
               id="wallet"
               type="text"
-              placeholder="0x1234...abcd or leave empty for random"
+              placeholder="4Xz1ACZ6q...HSjAv or leave empty for random"
               value={walletAddress}
               onChange={(e) => setWalletAddress(e.target.value)}
               className="w-full h-11 rounded-md px-4 bg-white/10 border-white/30 text-white placeholder:text-white/60 focus:border-white/60 backdrop:blur-md"

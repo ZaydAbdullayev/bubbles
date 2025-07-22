@@ -7,30 +7,13 @@ export default function BubblesPage({ setOpen }) {
   const [newBubbleId, setNewBubbleId] = useState("");
 
   useEffect(() => {
-    // Generate realistic fake wallet addresses
     const generateWalletAddress = () => {
-      const prefixes = ["0x", "0x", "0x", "bc1", "addr1"]; // Mostly Ethereum, some Bitcoin/Cardano
-      const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
-      const chars = "0123456789abcdef";
-      let address = prefix;
+      const base58 =
+        "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+      let address = "";
 
-      if (prefix === "0x") {
-        // Ethereum-style address
-        for (let i = 0; i < 40; i++) {
-          address += chars[Math.floor(Math.random() * chars.length)];
-        }
-      } else if (prefix === "bc1") {
-        // Bitcoin bech32 style
-        const bech32chars = "0123456789abcdefghjkmnpqrstvwxyz";
-        for (let i = 0; i < 35; i++) {
-          address +=
-            bech32chars[Math.floor(Math.random() * bech32chars.length)];
-        }
-      } else {
-        // Other formats
-        for (let i = 0; i < 50; i++) {
-          address += chars[Math.floor(Math.random() * chars.length)];
-        }
+      for (let i = 0; i < 44; i++) {
+        address += base58[Math.floor(Math.random() * base58.length)];
       }
 
       return address;
@@ -180,7 +163,7 @@ export default function BubblesPage({ setOpen }) {
 
   const formatWallet = (wallet) => {
     if (wallet.length > 10) {
-      return `${wallet.slice(0, 6)}...${wallet.slice(-4)}`;
+      return `${wallet.slice(0, 6)}...${wallet.slice(-6)}`;
     }
     return wallet;
   };
